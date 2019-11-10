@@ -1,0 +1,92 @@
+package Analizadores.Cup;
+
+
+import Analizadores.Flex.Lexer;
+import java_cup.runtime.Symbol;
+import java.util.ArrayList;
+import java.util.List;
+import java_cup.runtime.XMLElement;
+import javax.swing.JTextArea;
+import Model.Instruccion;
+
+
+
+parser code {:
+
+    JTextArea area;
+    List<Instruccion> listaInstrucciones;
+
+
+    public parser(Lexer lex,JTextArea area) {
+        super(lex);
+        this.area=area;
+    }
+
+	public List<Instruccion> getListaInstrucciones(){
+		return listaInstrucciones;
+	}
+
+
+  public void syntax_error(Symbol cur_token) {
+        
+        area.append("OCURRIO UN ERROR SINTACTICO, FILA: " + cur_token.left + ", COLUMNA: " +cur_token.right + " TOKEN:" +cur_token.value);
+	
+    }
+    
+	
+:}
+
+/* Terminals (tokens returned by the scanner). */
+terminal Object INSTRUCCION,PARENTESIS_ABIERTO,PARENTESIS_CERRADO,COMA,ALTA,BAJA,MEDIA,ADELANTE,ATRAS,IZQUIERDA,DERECHA,PARAR,ENCENDER,APAGAR,NUMEROS;
+
+         
+
+/* Non-terminals */
+
+non terminal Object global;
+non terminal Integer tiempo;
+non terminal String tipo_movimiento,velocidad;
+non terminal Instruccion instruction;
+non terminal List<Instruccion> instructions;
+
+
+/* The grammar */
+start with global;
+
+global ::= instructions:e {:
+	listaInstrucciones = e;
+:};
+
+instructions::= instructions:e1 instruction:e2{:
+e1.add(e2);
+RESULT = e1;
+
+:} | instruction:e {:
+List<Instruccion> lista = new ArrayList<>();
+lista.add(e);
+RESULT = lista;
+:};
+
+instruction::= INSTRUCCION PARENTESIS_ABIERTO tipo_movimiento:tipoMovimiento COMA tiempo:tiempo COMA velocidad:velocidad  PARENTESIS_CERRADO {:
+
+	RESULT = new Instruccion(tipoMovimiento, tiempo, velocidad);
+:};
+
+tipo_movimiento ::= ADELANTE {:RESULT = "a";:} |
+ ATRAS {:RESULT = "e";:} |
+ IZQUIERDA {:RESULT = "b";:} |
+ DERECHA {:RESULT = "d";:} |
+ PARAR {:RESULT = "c";:} |
+ ENCENDER {:RESULT = "f";:} |
+ APAGAR {:RESULT = "g";:};
+
+tiempo ::= NUMEROS:numeros {:RESULT = Integer.parseInt(numeros.toString());:};
+
+velocidad ::= ALTA {:RESULT = "h";:}| BAJA {:RESULT = "j";:}| MEDIA{:RESULT = "i";:};
+
+
+
+
+
+
+
