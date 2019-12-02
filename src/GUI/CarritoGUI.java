@@ -27,9 +27,10 @@ public class CarritoGUI extends javax.swing.JFrame {
     boolean bandera = false;
     String ultimaInstruccion = "", ultimaVelocidad = "ALTA";
 
-    public CarritoGUI() {
+    public CarritoGUI() throws Exception {
         initComponents();
         arduino = new PanamaHitek_Arduino();
+        
         setPanelControl(true);
     }
 
@@ -108,7 +109,7 @@ public class CarritoGUI extends javax.swing.JFrame {
                         int valorPuerto = Integer.parseInt(puerto.substring(3));
                         System.out.println(valorPuerto);
                         try {
-                            arduino.arduinoTX(puerto, 9600);
+                            arduino.arduinoTX("/dev/ttyACM1", 9600);
                             this.labelBluetooth.setText("Conectado al puerto: " + puerto);
                             setPanelControl(true);
                         } catch (UnsatisfiedLinkError e) {
